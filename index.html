@@ -1,0 +1,1504 @@
+<!DOCTYPE html><html lang="pt-BR"><head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Curso Introdutório de Looker Studio para Usuários de Planilhas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <style>
+        :root {
+            --color-primary: #1e3a5f;
+            --color-secondary: #2d5a87;
+            --color-accent: #4a90b8;
+            --color-neutral: #f8fafc;
+            --color-text: #1f2937;
+            --color-text-light: #6b7280;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            color: var(--color-text);
+            line-height: 1.6;
+        }
+        
+        .serif-heading {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .hero-gradient {
+            background: linear-gradient(135deg, 
+                rgba(30, 58, 95, 0.95) 0%, 
+                rgba(45, 90, 135, 0.9) 50%, 
+                rgba(74, 144, 184, 0.85) 100%);
+        }
+        
+        .toc-fixed {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100vh;
+            background: rgba(248, 250, 252, 0.95);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid #e2e8f0;
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 2rem 1.5rem;
+        }
+        
+        .main-content {
+            margin-left: 280px;
+            min-height: 100vh;
+        }
+        
+        .toc-link {
+            display: block;
+            padding: 0.5rem 0;
+            color: var(--color-text-light);
+            text-decoration: none;
+            border-left: 2px solid transparent;
+            padding-left: 1rem;
+            margin-left: -1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .toc-link:hover {
+            color: var(--color-primary);
+            border-left-color: var(--color-accent);
+            background: rgba(74, 144, 184, 0.05);
+        }
+        
+        .toc-link.active {
+            color: var(--color-primary);
+            border-left-color: var(--color-primary);
+            font-weight: 500;
+        }
+        
+        .section-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
+            margin: 3rem 0;
+        }
+        
+        .citation {
+            display: inline-block;
+            background: var(--color-accent);
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            text-decoration: none;
+            margin: 0 0.2rem;
+            transition: all 0.2s ease;
+        }
+        
+        .citation:hover {
+            background: var(--color-primary);
+            transform: translateY(-1px);
+        }
+        
+        .bento-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(74, 144, 184, 0.1), rgba(30, 58, 95, 0.05));
+            border-left: 4px solid var(--color-accent);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 0.5rem 0.5rem 0;
+        }
+        
+        @media (max-width: 1024px) {
+            .toc-fixed {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            
+            .toc-fixed.open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .bento-grid {
+                grid-template-columns: 1fr;
+            }
+
+            /* Prevent horizontal overflow */
+            body {
+                overflow-x: hidden;
+            }
+        }
+
+        /* Additional mobile styles for screens up to 768px */
+        @media (max-width: 768px) {
+            .bento-grid {
+                gap: 1rem;
+            }
+
+            .highlight-box {
+                padding: 1rem;
+                margin: 1rem 0;
+            }
+
+            .px-8 {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+
+            .hero-gradient .bento-grid > div:first-child {
+                padding: 1.5rem;
+            }
+
+            .hero-gradient .serif-heading {
+                font-size: 2.5rem;
+            }
+
+            .hero-gradient p {
+                font-size: 1rem;
+            }
+
+            .hero-gradient img {
+                height: auto;
+                max-height: 200px;
+            }
+        }
+    </style>
+  </head>
+
+  <body>
+    <!-- Table of Contents -->
+    <nav class="toc-fixed">
+      <div class="mb-8">
+        <h3 class="serif-heading text-lg font-bold text-gray-800 mb-4">Índice</h3>
+      </div>
+
+      <div class="space-y-2">
+        <a href="#introducao" class="toc-link text-sm">1. Introdução e Preparação</a>
+        <div class="ml-4 space-y-1">
+          <a href="#o-que-e-looker-studio" class="toc-link text-xs">1.1 O que é o Looker Studio?</a>
+          <a href="#beneficios-planilhas" class="toc-link text-xs">1.2 Benefícios para Usuários de Planilhas</a>
+          <a href="#preparando-planilha" class="toc-link text-xs">1.3 Preparando sua Planilha</a>
+        </div>
+
+        <a href="#conectando" class="toc-link text-sm">2. Conectando sua Planilha</a>
+        <div class="ml-4 space-y-1">
+          <a href="#criando-fonte-dados" class="toc-link text-xs">2.1 Criando Nova Fonte de Dados</a>
+          <a href="#configurando-conexao" class="toc-link text-xs">2.2 Configurando a Conexão</a>
+          <a href="#verificando-tipos-dados" class="toc-link text-xs">2.3 Verificando Tipos de Dados</a>
+        </div>
+
+        <a href="#fundamentos" class="toc-link text-sm">3. Fundamentos: Dimensões e Métricas</a>
+        <div class="ml-4 space-y-1">
+          <a href="#dimensoes" class="toc-link text-xs">3.1 O que são Dimensões?</a>
+          <a href="#metricas" class="toc-link text-xs">3.2 O que são Métricas?</a>
+          <a href="#relacao-dimensao-metrica" class="toc-link text-xs">3.3 Relação entre Dimensões e Métricas</a>
+        </div>
+
+        <a href="#visualizacoes" class="toc-link text-sm">4. Criando Visualizações</a>
+        <div class="ml-4 space-y-1">
+          <a href="#tabelas" class="toc-link text-xs">4.1 Adicionando Tabelas</a>
+          <a href="#graficos" class="toc-link text-xs">4.2 Criando Gráficos</a>
+          <a href="#scorecards" class="toc-link text-xs">4.3 Cartões de Pontuação</a>
+        </div>
+
+        <a href="#interatividade" class="toc-link text-sm">5. Adicionando Interatividade</a>
+        <div class="ml-4 space-y-1">
+          <a href="#filtros-data" class="toc-link text-xs">5.1 Filtros de Intervalo de Data</a>
+          <a href="#filtros-dimensao" class="toc-link text-xs">5.2 Filtros de Dimensão</a>
+          <a href="#cross-filtering" class="toc-link text-xs">5.3 Filtros de Cruzamento</a>
+        </div>
+
+        <a href="#finalizando" class="toc-link text-sm">6. Finalizando e Compartilhando</a>
+        <div class="ml-4 space-y-1">
+          <a href="#temas-layouts" class="toc-link text-xs">6.1 Temas e Layouts</a>
+          <a href="#titulos-anotacoes" class="toc-link text-xs">6.2 Títulos e Anotações</a>
+          <a href="#compartilhando" class="toc-link text-xs">6.3 Compartilhando seu Relatório</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Hero Section -->
+      <section class="hero-gradient text-white relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+          <img src="https://kimi-web-img.moonshot.cn/img/png.pngtree.com/fa374aef38cacc91882e05ea8029d8087bb43c72.jpg" alt="Abstract data network connections" class="w-full h-full object-cover" size="wallpaper" aspect="wide" query="abstract data network connections" referrerpolicy="no-referrer" data-modified="1" data-score="0.00"/>
+        </div>
+
+        <div class="relative z-10 px-8 py-16">
+          <div class="max-w-6xl mx-auto">
+            <div class="bento-grid">
+              <div class="space-y-6">
+                <h1 class="serif-heading text-5xl font-bold leading-tight">
+                  <em class="italic text-4xl block mb-2 opacity-90">Curso Introdutório de</em>
+                  Looker Studio para Usuários de Planilhas
+                </h1>
+
+                <p class="text-xl opacity-90 leading-relaxed">
+                  Transforme seus dados de planilhas em dashboards interativos e profissionais. Aprenda a criar visualizações impactantes que contam a história por trás dos números.
+                </p>
+
+                <div class="flex items-center space-x-4 text-sm opacity-80">
+                  <span><i class="fas fa-chart-line mr-2"></i>Business Intelligence</span>
+                  <span><i class="fas fa-table mr-2"></i>Google Sheets</span>
+                  <span><i class="fas fa-chart-bar mr-2"></i>Data Visualization</span>
+                </div>
+              </div>
+
+              <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-6">
+                <h3 class="serif-heading text-2xl font-bold mb-4">O que você aprenderá</h3>
+                <ul class="space-y-3">
+                  <li class="flex items-start space-x-3">
+                    <i class="fas fa-check-circle text-green-300 mt-1"></i>
+                    <span>Conectar planilhas Google e preparar dados</span>
+                  </li>
+                  <li class="flex items-start space-x-3">
+                    <i class="fas fa-check-circle text-green-300 mt-1"></i>
+                    <span>Compreender dimensões e métricas</span>
+                  </li>
+                  <li class="flex items-start space-x-3">
+                    <i class="fas fa-check-circle text-green-300 mt-1"></i>
+                    <span>Criar tabelas, gráficos e cartões de pontuação</span>
+                  </li>
+                  <li class="flex items-start space-x-3">
+                    <i class="fas fa-check-circle text-green-300 mt-1"></i>
+                    <span>Adicionar controles de filtro interativos</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="px-8 py-12 max-w-6xl mx-auto">
+        <!-- Introduction Section -->
+        <section id="introducao" class="mb-16">
+          <h2 class="serif-heading text-4xl font-bold text-gray-800 mb-8">1. Introdução e Preparação</h2>
+
+          <div id="o-que-e-looker-studio" class="mb-12">
+            <h3 class="serif-heading text-2xl font-semibold text-gray-700 mb-6">1.1 O que é o Looker Studio?</h3>
+
+            <div class="prose prose-lg max-w-none">
+              <p class="mb-6">
+                O Looker Studio, anteriormente conhecido como Google Data Studio, é uma ferramenta de business intelligence (BI) e visualização de dados, desenvolvida pelo Google, que permite aos usuários criar relatórios e dashboards interativos e personalizáveis de forma gratuita <a href="https://measureschool.com/looker-studio-basics/" class="citation" target="_blank">[24]</a>. A plataforma se destaca por sua capacidade de se conectar a uma ampla variedade de fontes de dados, incluindo produtos do próprio Google como Google Sheets, Google Analytics e Google Ads.
+              </p>
+
+              <div class="highlight-box">
+                <h4 class="font-semibold text-lg mb-3">
+                  <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>
+                  Principais características do Looker Studio:
+                </h4>
+                <ul class="space-y-2">
+                  <li><strong>+800 fontes de dados:</strong> Conecte-se a praticamente qualquer fonte de dados através de mais de 630 conectores de terceiros</li>
+                  <li><strong>Interface intuitiva:</strong> Transforme dados brutos em visualizações compreensíveis e atraentes</li>
+                  <li><strong>Baseado na web:</strong> Facilita a colaboração em tempo real e o compartilhamento de relatórios com stakeholders</li>
+                  <li><strong>Atualização automática:</strong> Relatórios que se atualizam automaticamente, garantindo informações sempre atualizadas</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div id="beneficios-planilhas" class="mb-12">
+            <h3 class="serif-heading text-2xl font-semibold text-gray-700 mb-6">1.2 Benefícios para Usuários de Planilhas</h3>
+
+            <div class="grid md:grid-cols-2 gap-8 mb-8">
+              <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+                <div class="flex items-center mb-4">
+                  <i class="fas fa-chart-bar text-3xl text-blue-600 mr-4"></i>
+                  <h4 class="font-semibold text-lg">Visualizações Avançadas</h4>
+                </div>
+                <p class="text-gray-600">
+                  Crie dashboards visualmente atraentes e profissionais que superam as opções básicas de gráficos disponíveis nas planilhas <a href="https://www.swydo.com/blog/looker-studio-to-google-sheets/" class="citation" target="_blank">[15]</a>.
+                </p>
+              </div>
+
+              <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+                <div class="flex items-center mb-4">
+                  <i class="fas fa-sync-alt text-3xl text-green-600 mr-4"></i>
+                  <h4 class="font-semibold text-lg">Automação de Dados</h4>
+                </div>
+                <p class="text-gray-600">
+                  Configure atualizações automáticas a partir da fonte de dados conectada, economizando tempo e reduzindo erros humanos <a href="https://www.swydo.com/blog/looker-studio-to-google-sheets/" class="citation" target="_blank">[15]</a>.
+                </p>
+              </div>
+
+              <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+                <div class="flex items-center mb-4">
+                  <i class="fas fa-users text-3xl text-purple-600 mr-4"></i>
+                  <h4 class="font-semibold text-lg">Colaboração Aprimorada</h4>
+                </div>
+                <p class="text-gray-600">
+                  Compartilhe relatórios facilmente com controles de permissão detalhados para visualização e edição <a href="https://www.swydo.com/blog/looker-studio-to-google-sheets/" class="citation" target="_blank">[15]</a>.
+                </p>
+              </div>
+
+              <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+                <div class="flex items-center mb-4">
+                  <i class="fas fa-expand-arrows-alt text-3xl text-orange-600 mr-4"></i>
+                  <h4 class="font-semibold text-lg">Escalabilidade</h4>
+                </div>
+                <p class="text-gray-600">
+                  Solução mais escalável capaz de lidar com volumes maiores de dados e maior complexidade de análise <a href="https://www.swydo.com/blog/looker-studio-to-google-sheets/" class="citation" target="_blank">[15]</a>.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div id="preparando-planilha" class="mb-12">
+            <h3 class="serif-heading text-2xl font-semibold text-gray-700 mb-6">1.3 Preparando sua Planilha Google para Conexão</h3>
+
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-6 mb-8">
+              <div class="flex">
+                <i class="fas fa-exclamation-triangle text-yellow-400 mr-3 mt-1"></i>
+                <div>
+                  <h4 class="font-semibold text-yellow-800 mb-2">Importante!</h4>
+                  <p class="text-yellow-700">
+                    O Looker Studio é uma ferramenta de visualização e não de transformação de dados. Ele funciona melhor quando os dados de origem já estão limpos, organizados e prontos para análise <a href="https://blog.coupler.io/google-data-studio-tutorial-for-beginners/" class="citation" target="_blank">[2]</a>.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-8">
+              <div>
+                <h4 class="font-semibold text-xl mb-4">1.3.1 Organizando os Dados em Formato Tabular</h4>
+                <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+                  <p class="mb-4">
+                    Os dados devem ser estruturados em linhas e colunas, onde cada linha representa um registro único (por exemplo, uma venda, uma visita ao site) e cada coluna representa um atributo desse registro <a href="https://www.swydo.com/blog/looker-studio-to-google-sheets/" class="citation" target="_blank">[15]</a>.
+                  </p>
+                  <ul class="space-y-2 text-gray-600">
+                    <li>• Garanta que a primeira linha contenha cabeçalhos claros e descritivos</li>
+                    <li>• Remova linhas de cabeçalho extras e rodapés com totais</li>
+                    <li>• Elimine colunas em branco desnecessárias</li>
+                    <li>• Evite células mescladas, tabelas dinâmicas ou gráficos na planilha</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div>
+                <h4 class="font-semibold text-xl mb-4">1.3.2 Limpando Dados e Removendo Duplicatas</h4>
+                <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+                  <p class="mb-4">
+                    A qualidade dos dados de entrada diretamente impacta a qualidade das visualizações geradas. Dados sujos ou inconsistentes podem levar a insights enganosos <a href="https://blog.coupler.io/google-data-studio-tutorial-for-beginners/" class="citation" target="_blank">[2]</a>.
+                  </p>
+
+                  <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                      <h5 class="font-medium mb-2">Passos de limpeza:</h5>
+                      <ul class="space-y-1 text-sm text-gray-600">
+                        <li>• Remover duplicatas (Dados &gt; Remover duplicatas)</li>
+                        <li>• Corrigir valores inconsistentes</li>
+                        <li>• Tratar células vazias</li>
+                        <li>• Validar tipos de dados em cada coluna</li>
+                      </ul>
+                    </div>
+                    <div>
+                      <h5 class="font-medium mb-2">Dicas importantes:</h5>
+                      <ul class="space-y-1 text-sm text-gray-600">
+                        <li>• Padronize formatos de data e moeda</li>
+                        <li>• Use nomes descritivos para abas da planilha</li>
+                        <li>• Verifique consistência entre múltiplas abas</li>
+                        <li>• Teste a conexão com uma amostra de dados</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <!-- Connection Section -->
+        <section id="conectando" class="mb-16">
+          <h2 class="serif-heading text-4xl font-bold text-gray-800 mb-8">2. Conectando sua Planilha Google ao Looker Studio</h2>
+
+          <div id="criando-fonte-dados" class="mb-12">
+            <h3 class="serif-heading text-2xl font-semibold text-gray-700 mb-6">2.1 Criando uma Nova Fonte de Dados</h3>
+
+            <div class="space-y-6">
+              <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+                <h4 class="font-semibold text-lg mb-4">
+                  <i class="fas fa-play-circle text-green-600 mr-2"></i>
+                  Passo 1: Acessando o Looker Studio
+                </h4>
+                <p class="mb-4">
+                  Acesse <code class="bg-gray-100 px-2 py-1 rounded">lookerstudio.google.com</code> e faça login com sua conta Google <a href="https://www.reportingninja.com/blog/how-to-use-looker-studio-beginners-guide" class="citation" target="_blank">[25]</a>.
+                </p>
+                <p>
+                  Clique no botão <strong>&#34;+ Criar&#34;</strong> no canto superior esquerdo e selecione <strong>&#34;Relatório&#34;</strong>
+                  <a href="https://measureschool.com/google-looker-studio-tutorial/" class="citation" target="_blank">[1]</a>
+                  <a href="https://measureschool.com/google-looker-studio-tutorial/" class="citation" target="_blank">[13]</a>.
+                </p>
+              </div>
+
+              <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+                <h4 class="font-semibold text-lg mb-4">
+                  <i class="fas fa-plug text-blue-600 mr-2"></i>
+                  Passo 2: Selecionando o Conector &#34;Google Sheets&#34;
+                </h4>
+                <p class="mb-4">
+                  No painel &#34;Adicionar dados ao relatório&#34;, localize e selecione o conector <strong>&#34;Google Sheets&#34;</strong> na lista de conectores do Google <a href="https://measureschool.com/google-looker-studio-tutorial/" class="citation" target="_blank">[13]</a>.
+                </p>
+                <p>
+                  O Looker Studio solicitará que você autorize o acesso ao Google Drive. Essa autorização é necessária para que a ferramenta possa ler os dados da planilha <a href="https://help.funnel.io/en/articles/1074183-how-to-connect-your-google-sheets-data-to-google-data-studio" class="citation" target="_blank">[7]</a>.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div id="configurando-conexao" class="mb-12">
+            <h3 class="serif-heading text-2xl font-semibold text-gray-700 mb-6">2.2 Configurando a Conexão</h3>
+
+            <div class="space-y-6">
+              <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+                <h4 class="font-semibold text-lg mb-4">Escolhendo a Planilha e Aba Correta</h4>
+                <p class="mb-4">
+                  Após autorizar o acesso, selecione a planilha desejada e a aba (worksheet) que contém os dados que deseja analisar <a href="https://hevodata.com/learn/google-sheets-to-google-data-studio/" class="citation" target="_blank">[6]</a>.
+                </p>
+                <div class="bg-blue-50 p-4 rounded-lg">
+                  <p class="text-blue-800 text-sm">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    Se sua planilha contém múltiplas abas com dados relacionados, você precisará criar uma fonte de dados separada para cada aba.
+                  </p>
+                </div>
+              </div>
+
+              <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+                <h4 class="font-semibold text-lg mb-4">Verificando a Opção &#34;Usar Primeira Linha como Cabeçalhos&#34;</h4>
+                <p class="mb-4">
+                  Certifique-se de que a opção <strong>&#34;Usar primeira linha como cabeçalhos&#34;</strong> esteja marcada. Isso instrui o Looker Studio a usar os valores da primeira linha como nomes de campo <a href="https://www.optimizesmart.com/how-to-use-google-data-studio-with-google-sheets/" class="citation" target="_blank">[4]</a>
+                  <a href="https://bymarketers.co/how-to-connect-google-sheets-to-google-data/" class="citation" target="_blank">[5]</a>.
+                </p>
+                <p class="text-gray-600 text-sm">
+                  Se esta opção não estiver marcada, o Looker Studio atribuirá nomes de campo genéricos (Coluna A, Coluna B), dificultando a identificação dos campos.
+                </p>
+              </div>
+
+              <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+                <h4 class="font-semibold text-lg mb-4">Intervalo de Células Específico (Opcional)</h4>
+                <p class="mb-4">
+                  Você pode definir um intervalo de células específico usando a sintaxe padrão (ex: <code>A1:Z100</code>) para importar apenas um subconjunto de dados <a href="https://www.optimizesmart.com/how-to-use-google-data-studio-with-google-sheets/" class="citation" target="_blank">[4]</a>.
+                </p>
+                <p class="text-gray-600 text-sm">
+                  Isso é útil para excluir linhas vazias, rodapés com totais ou áreas da planilha que não são relevantes para a análise.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div id="verificando-tipos-dados" class="mb-12">
+            <h3 class="serif-heading text-2xl font-semibold text-gray-700 mb-6">2.3 Verificando e Ajustando os Tipos de Dados</h3>
+
+            <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100 mb-6">
+              <p class="mb-4">
+                Após estabelecer a conexão, o Looker Studio exibe uma tela de configuração da fonte de dados onde você pode verificar e ajustar os tipos de dados de cada campo importado <a href="https://www.optimizesmart.com/how-to-use-google-data-studio-with-google-sheets/" class="citation" target="_blank">[12]</a>.
+              </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8">
+              <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+                <h4 class="font-semibold text-lg mb-4 text-green-700">
+                  <i class="fas fa-leaf mr-2"></i>
+                  Campos de Dimensão (Verdes)
+                </h4>
+                <p class="mb-4">
+                  Atributos qualitativos que descrevem ou categorizam os dados (ex: Produto, Região, Data) <a href="https://www.databloo.com/blog/google-looker-studio-dimension-vs-metric/" class="citation" target="_blank">[11]</a>.
+                </p>
+                <ul class="space-y-1 text-sm text-gray-600">
+                  <li>• Usados para agrupar e filtrar dados</li>
+                  <li>• Contêm dados não agregados</li>
+                  <li>• Representados por ícones verdes</li>
+                </ul>
+              </div>
+
+              <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+                <h4 class="font-semibold text-lg mb-4 text-blue-700">
+                  <i class="fas fa-chart-line mr-2"></i>
+                  Campos de Métrica (Azuis)
+                </h4>
+                <p class="mb-4">
+                  Valores quantitativos que medem o desempenho (ex: Vendas, Receita, Quantidade) <a href="https://www.databloo.com/blog/google-looker-studio-dimension-vs-metric/" class="citation" target="_blank">[11]</a>.
+                </p>
+                <ul class="space-y-1 text-sm text-gray-600">
+                  <li>• Resultado de agregações (soma, contagem, média)</li>
+                  <li>• Fornecem medidas numéricas</li>
+                  <li>• Representados por ícones azuis</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="mt-8 bg-amber-50 border-l-4 border-amber-400 p-6">
+              <h4 class="font-semibold text-amber-800 mb-2">
+                <i class="fas fa-exclamation-triangle mr-2"></i>
+                Correção de Tipos de Dados
+              </h4>
+              <p class="text-amber-700 mb-2">
+                Verifique e corrija os tipos de dados incorretos. Por exemplo, uma coluna de datas interpretada como texto impedirá a criação correta de gráficos de séries temporais <a href="https://www.optimizesmart.com/how-to-use-google-data-studio-with-google-sheets/" class="citation" target="_blank">[12]</a>.
+              </p>
+              <p class="text-amber-700 text-sm">
+                Clique no ícone do tipo de dados e selecione o tipo correto: Texto, Número, Data, Moeda, etc.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <!-- Fundamentals Section -->
+        <section id="fundamentos" class="mb-16">
+          <h2 class="serif-heading text-4xl font-bold text-gray-800 mb-8">3. Fundamentos: Dimensões e Métricas</h2>
+
+          <div id="dimensoes" class="mb-12">
+            <h3 class="serif-heading text-2xl font-semibold text-gray-700 mb-6">3.1 O que são Dimensões?</h3>
+
+            <div class="bg-white rounded-lg p-8 shadow-sm border border-gray-100 mb-8">
+              <p class="text-lg mb-6">
+                No Looker Studio, uma <strong>dimensão</strong> é um atributo ou campo qualitativo em um conjunto de dados que é usado para organizar, agrupar ou filtrar as informações <a href="https://www.databloo.com/blog/google-looker-studio-dimension-vs-metric/" class="citation" target="_blank">[11]</a>.
+              </p>
+
+              <div class="grid md:grid-cols-3 gap-6">
+                <div class="text-center">
+                  <i class="fas fa-question-circle text-4xl text-green-600 mb-3"></i>
+                  <h4 class="font-semibold">Quem?</h4>
+                  <p class="text-sm text-gray-600">Cliente, Vendedor, Usuário</p>
+                </div>
+                <div class="text-center">
+                  <i class="fas fa-question-circle text-4xl text-green-600 mb-3"></i>
+                  <h4 class="font-semibold">O quê?</h4>
+                  <p class="text-sm text-gray-600">Produto, Categoria, Canal</p>
+                </div>
+                <div class="text-center">
+                  <i class="fas fa-question-circle text-4xl text-green-600 mb-3"></i>
+                  <h4 class="font-semibold">Onde?</h4>
+                  <p class="text-sm text-gray-600">Região, Cidade, País</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-6">
+              <div class="bg-green-50 border-l-4 border-green-500 p-6">
+                <h4 class="font-semibold text-green-800 mb-3">
+                  <i class="fas fa-leaf mr-2"></i>
+                  Identificando Dimensões (Campos Verdes)
+                </h4>
+                <p class="text-green-700 mb-2">
+                  As dimensões no Looker Studio são representadas visualmente por campos de cor <strong>verde</strong> no painel de propriedades e no editor de fonte de dados <a href="https://www.databloo.com/blog/google-looker-studio-dimension-vs-metric/" class="citation" target="_blank">[8]</a>
+                  <a href="https://www.optimizesmart.com/how-to-use-google-data-studio-with-google-sheets/" class="citation" target="_blank">[12]</a>.
+                </p>
+                <p class="text-green-700 text-sm">
+                  Exemplos comuns: Nome do Produto, Cidade, Canal de Marketing, Data da Transação.
+                </p>
+              </div>
+
+              <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+                <h4 class="font-semibold text-lg mb-4">Exemplos Práticos de Dimensões</h4>
+                <div class="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <h5 class="font-medium mb-2 text-blue-700">Em um relatório de vendas:</h5>
+                    <ul class="space-y-1 text-sm">
+                      <li>• <strong>Data da Venda:</strong> Análise temporal</li>
+                      <li>• <strong>Produto:</strong> Identificação de itens</li>
+                      <li>• <strong>Categoria:</strong> Agrupamento de produtos</li>
+                      <li>• <strong>Região:</strong> Análise geográfica</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h5 class="font-medium mb-2 text-blue-700">Em análise de tráfego:</h5>
+                    <ul class="space-y-1 text-sm">
+                      <li>• <strong>Página:</strong> URL visualizada</li>
+                      <li>• <strong>Fonte/Mídia:</strong> Origem do tráfego</li>
+                      <li>• <strong>Tipo de Dispositivo:</strong> Desktop, Mobile</li>
+                      <li>• <strong>Nome do Evento:</strong> Ações do usuário</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="metricas" class="mb-12">
+            <h3 class="serif-heading text-2xl font-semibold text-gray-700 mb-6">3.2 O que são Métricas?</h3>
+
+            <div class="bg-white rounded-lg p-8 shadow-sm border border-gray-100 mb-8">
+              <p class="text-lg mb-6">
+                Uma <strong>métrica</strong> é um campo de dados quantitativo que representa uma medida numérica do desempenho ou do impacto de uma dimensão <a href="https://www.databloo.com/blog/google-looker-studio-dimension-vs-metric/" class="citation" target="_blank">[11]</a>.
+              </p>
+
+              <div class="grid md:grid-cols-3 gap-6">
+                <div class="text-center">
+                  <i class="fas fa-calculator text-4xl text-blue-600 mb-3"></i>
+                  <h4 class="font-semibold">Quanto?</h4>
+                  <p class="text-sm text-gray-600">Receita, Vendas, Lucro</p>
+                </div>
+                <div class="text-center">
+                  <i class="fas fa-calculator text-4xl text-blue-600 mb-3"></i>
+                  <h4 class="font-semibold">Quantos?</h4>
+                  <p class="text-sm text-gray-600">Pedidos, Clientes, Cliques</p>
+                </div>
+                <div class="text-center">
+                  <i class="fas fa-calculator text-4xl text-blue-600 mb-3"></i>
+                  <h4 class="font-semibold">Com que frequência?</h4>
+                  <p class="text-sm text-gray-600">Taxas, Porcentagens</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-6">
+              <div class="bg-blue-50 border-l-4 border-blue-500 p-6">
+                <h4 class="font-semibold text-blue-800 mb-3">
+                  <i class="fas fa-chart-line mr-2"></i>
+                  Identificando Métricas (Campos Azuis)
+                </h4>
+                <p class="text-blue-700 mb-2">
+                  As métricas no Looker Studio são representadas visualmente por campos de cor <strong>azul</strong> no painel de propriedades e no editor de fonte de dados <a href="https://www.databloo.com/blog/google-looker-studio-dimension-vs-metric/" class="citation" target="_blank">[8]</a>
+                  <a href="https://www.optimizesmart.com/how-to-use-google-data-studio-with-google-sheets/" class="citation" target="_blank">[12]</a>.
+                </p>
+                <p class="text-blue-700 text-sm">
+                  As métricas são geralmente o resultado de uma agregação: soma (SUM), contagem (COUNT), média (AVG), etc.
+                </p>
+              </div>
+
+              <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+                <h4 class="font-semibold text-lg mb-4">Exemplos Práticos de Métricas</h4>
+                <div class="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <h5 class="font-medium mb-2 text-green-700">Em um relatório de vendas:</h5>
+                    <ul class="space-y-1 text-sm">
+                      <li>• <strong>Receita Total:</strong> Soma dos valores de venda</li>
+                      <li>• <strong>Número de Pedidos:</strong> Contagem de transações</li>
+                      <li>• <strong>Ticket Médio:</strong> Valor médio dos pedidos</li>
+                      <li>• <strong>Margem de Lucro:</strong> Diferença percentual</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h5 class="font-medium mb-2 text-green-700">Em análise de marketing:</h5>
+                    <ul class="space-y-1 text-sm">
+                      <li>• <strong>Número de Cliques:</strong> Contagem de cliques</li>
+                      <li>• <strong>Taxa de Conversão:</strong> Porcentagem de conversões</li>
+                      <li>• <strong>Custo por Clique:</strong> Média de custo (CPC)</li>
+                      <li>• <strong>ROI:</strong> Retorno sobre investimento</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="relacao-dimensao-metrica" class="mb-12">
+            <h3 class="serif-heading text-2xl font-semibold text-gray-700 mb-6">3.3 A Relação entre Dimensões e Métricas</h3>
+
+            <div class="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-8 mb-8">
+              <div class="text-center mb-6">
+                <h4 class="serif-heading text-2xl font-bold text-gray-800 mb-2">A Fórmula da Análise de Dados</h4>
+                <p class="text-lg text-gray-600">
+                  <span class="bg-green-200 px-3 py-1 rounded">Dimensões (Verdes)</span>
+                  <span class="mx-2">+</span>
+                  <span class="bg-blue-200 px-3 py-1 rounded">Métricas (Azuis)</span>
+                  <span class="mx-2">=</span>
+                  <span class="bg-purple-200 px-3 py-1 rounded">Insights Ação</span>
+                </p>
+              </div>
+              <p class="text-center text-gray-700">
+                As dimensões fornecem o <strong>&#34;o quê&#34;</strong> e as métricas fornecem o <strong>&#34;quanto&#34;</strong>
+                <a href="https://www.databloo.com/blog/google-looker-studio-dimension-vs-metric/" class="citation" target="_blank">[11]</a>.
+              </p>
+            </div>
+
+            <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100 mb-6">
+              <h4 class="font-semibold text-lg mb-4">Como as Métricas Fornecem Insights sobre as Dimensões</h4>
+              <p class="mb-4">
+                As métricas são a lente através da qual as dimensões são analisadas. Elas transformam categorias em fontes de insights acionáveis.
+              </p>
+
+              <div class="space-y-4">
+                <div class="flex items-start space-x-3">
+                  <div class="bg-green-100 p-2 rounded">
+                    <i class="fas fa-leaf text-green-600"></i>
+                  </div>
+                  <div>
+                    <p class="font-medium">Dimensão: Produto</p>
+                    <p class="text-sm text-gray-600">Categoriza os itens vendidos</p>
+                  </div>
+                  <div class="bg-blue-100 p-2 rounded">
+                    <i class="fas fa-chart-line text-blue-600"></i>
+                  </div>
+                  <div>
+                    <p class="font-medium">Métrica: Receita Total</p>
+                    <p class="text-sm text-gray-600">Mede o desempenho de cada produto</p>
+                  </div>
+                </div>
+
+                <div class="flex items-start space-x-3">
+                  <div class="bg-green-100 p-2 rounded">
+                    <i class="fas fa-leaf text-green-600"></i>
+                  </div>
+                  <div>
+                    <p class="font-medium">Dimensão: Região</p>
+                    <p class="text-sm text-gray-600">Segmenta por área geográfica</p>
+                  </div>
+                  <div class="bg-blue-100 p-2 rounded">
+                    <i class="fas fa-chart-line text-blue-600"></i>
+                  </div>
+                  <div>
+                    <p class="font-medium">Métrica: Número de Clientes</p>
+                    <p class="text-sm text-gray-600">Compara penetração de mercado</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="highlight-box">
+              <h4 class="font-semibold text-lg mb-3">
+                <i class="fas fa-table mr-2"></i>
+                Comparação com Tabelas Dinâmicas em Planilhas
+              </h4>
+              <p class="mb-4">
+                Para usuários de planilhas, a relação entre dimensões e métricas no Looker Studio é análoga às tabelas dinâmicas (pivot tables):
+              </p>
+              <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                  <h5 class="font-medium mb-2">Tabela Dinâmica</h5>
+                  <ul class="space-y-1 text-sm">
+                    <li>• <strong>Linhas/Colunas:</strong> Dimensões</li>
+                    <li>• <strong>Valores:</strong> Métricas</li>
+                    <li>• <strong>Filtros:</strong> Filtros de dimensão</li>
+                  </ul>
+                </div>
+                <div>
+                  <h5 class="font-medium mb-2">Looker Studio</h5>
+                  <ul class="space-y-1 text-sm">
+                    <li>• <strong>Dimensões:</strong> Campos verdes</li>
+                    <li>• <strong>Métricas:</strong> Campos azuis</li>
+                    <li>• <strong>Visualizações:</strong> Gráficos, tabelas</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <!-- Visualizations Section -->
+        <section id="visualizacoes" class="mb-16">
+          <h2 class="serif-heading text-4xl font-bold text-gray-800 mb-8">4. Criando Visualizações: Tabelas e Gráficos</h2>
+
+          <div id="tabelas" class="mb-12">
+            <h3 class="serif-heading text-2xl font-semibold text-gray-700 mb-6">4.1 Adicionando uma Tabela</h3>
+
+            <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100 mb-6">
+              <p class="mb-4">
+                As tabelas são ideais para exibir informações detalhadas e permitir análise comparativa linha por linha. São uma das formas mais diretas de apresentar dados no Looker Studio.
+              </p>
+
+              <div class="bg-blue-50 p-4 rounded-lg">
+                <h4 class="font-semibold text-blue-800 mb-2">
+                  <i class="fas fa-info-circle mr-2"></i>
+                  Inserindo uma Tabela
+                </h4>
+                <p class="text-blue-700 text-sm">
+                  Clique no ícone &#34;Adicionar um gráfico&#34; na barra de ferramentas, e escolha um modelo de tabela.
+                </p>
+              </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 mb-8">
+              <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+                <h4 class="font-semibold text-lg mb-4">Adicionando Dimensões e Métricas</h4>
+                <p class="mb-4">
+                  No painel de propriedades, arraste e solte os campos da fonte de dados nas áreas apropriadas:
+                </p>
+                <ul class="space-y-2 text-sm">
+                  <li>• <span class="bg-green-100 px-2 py-1 rounded">Dimensões (verdes)</span> → Área de &#34;Dimensão&#34;</li>
+                  <li>• <span class="bg-blue-100 px-2 py-1 rounded">Métricas (azuis)</span> → Área de &#34;Métrica&#34;</li>
+                </ul>
+                <p class="mt-4 text-gray-600 text-sm">
+                  A ordem dos campos define a hierarquia de agrupamento na tabela.
+                </p>
+              </div>
+
+              <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+                <h4 class="font-semibold text-lg mb-4">Personalizando a Apresentação</h4>
+                <p class="mb-4">
+                  A guia &#34;Estilo&#34; no painel de propriedades permite personalizar:
+                </p>
+                <ul class="space-y-1 text-sm">
+                  <li>• Fonte, tamanho e cor do texto</li>
+                  <li>• Cores de fundo das linhas</li>
+                  <li>• Formatação condicional</li>
+                  <li>• Exibição de totais e paginação</li>
+                  <li>• Alinhamento do texto</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="bg-green-50 border-l-4 border-green-500 p-6">
+              <h4 class="font-semibold text-green-800 mb-2">
+                <i class="fas fa-sort-amount-down mr-2"></i>
+                Ordenação de Dados
+              </h4>
+              <p class="text-green-700 mb-2">
+                Você pode ordenar a tabela clicando nos ícones de seta no cabeçalho de qualquer coluna no modo de visualização.
+              </p>
+              <p class="text-green-700 text-sm">
+                Para definir uma ordenação padrão, use o painel de propriedades para especificar a coluna e direção (crescente/decrescente).
+              </p>
+            </div>
+          </div>
+
+          <div id="graficos" class="mb-12">
+            <h3 class="serif-heading text-2xl font-semibold text-gray-700 mb-6">4.2 Criando Gráficos</h3>
+
+            <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100 mb-8">
+              <p class="mb-6">
+                Os gráficos transformam dados brutos em insights visuais fáceis de entender e interpretar. A escolha do tipo de gráfico certo é fundamental para comunicar sua mensagem de forma eficaz.
+              </p>
+
+              <div class="overflow-x-auto">
+                <table class="w-full border-collapse border border-gray-300 rounded-lg">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th class="border border-gray-300 p-3 text-left font-semibold">Tipo de Gráfico</th>
+                      <th class="border border-gray-300 p-3 text-left font-semibold">Descrição</th>
+                      <th class="border border-gray-300 p-3 text-left font-semibold">Exemplo de Uso</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td class="border border-gray-300 p-3">
+                        <strong>Gráfico de Colunas/Barras</strong>
+                      </td>
+                      <td class="border border-gray-300 p-3">Compara valores entre categorias</td>
+                      <td class="border border-gray-300 p-3">Comparar receita por produto ou região</td>
+                    </tr>
+                    <tr class="bg-gray-50">
+                      <td class="border border-gray-300 p-3">
+                        <strong>Gráfico de Linhas/Série Temporal</strong>
+                      </td>
+                      <td class="border border-gray-300 p-3">Mostra tendências ao longo do tempo</td>
+                      <td class="border border-gray-300 p-3">Acompanhar evolução de vendas diárias/mensais</td>
+                    </tr>
+                    <tr>
+                      <td class="border border-gray-300 p-3">
+                        <strong>Gráfico de Pizza</strong>
+                      </td>
+                      <td class="border border-gray-300 p-3">Mostra proporção de partes do todo</td>
+                      <td class="border border-gray-300 p-3">Distribuição percentual de vendas por categoria</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="space-y-8">
+              <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+                <h4 class="font-semibold text-lg mb-4">
+                  <i class="fas fa-sliders-h mr-2 text-blue-600"></i>
+                  Configurando os Eixos com Dimensões e Métricas
+                </h4>
+                <div class="grid md:grid-cols-2 gap-6">
+                  <div class="bg-green-50 p-4 rounded">
+                    <h5 class="font-medium text-green-800 mb-2">Eixo X (Horizontal)</h5>
+                    <p class="text-green-700 text-sm">
+                      Geralmente contém uma <strong>dimensão</strong> que representa as categorias ou o tempo.
+                    </p>
+                  </div>
+                  <div class="bg-blue-50 p-4 rounded">
+                    <h5 class="font-medium text-blue-800 mb-2">Eixo Y (Vertical)</h5>
+                    <p class="text-blue-700 text-sm">
+                      Contém uma <strong>métrica</strong> que representa os valores quantitativos a serem medidos.
+                    </p>
+                  </div>
+                </div>
+                <p class="mt-4 text-gray-600 text-sm">
+                  No painel de propriedades, arraste os campos para as áreas &#34;Dimensão&#34; (eixo X) e &#34;Métrica&#34; (eixo Y).
+                </p>
+              </div>
+
+              <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+                <h4 class="font-semibold text-lg mb-4">
+                  <i class="fas fa-layer-group mr-2 text-purple-600"></i>
+                  Dimensões de Quebra (Breakdown)
+                </h4>
+                <p class="mb-4">
+                  Adicione um nível extra de detalhe arrastando uma segunda dimensão para a área de <strong>&#34;Quebra de Dimensão&#34;</strong>.
+                </p>
+                <div class="bg-purple-50 p-4 rounded">
+                  <p class="text-purple-700 text-sm">
+                    <i class="fas fa-lightbulb mr-2"></i>
+                    Exemplo: Um gráfico de barras com &#34;Mês&#34; no eixo X pode ter &#34;Categoria de Produto&#34; como quebra, mostrando a contribuição de cada categoria para as vendas mensais.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="scorecards" class="mb-12">
+            <h3 class="serif-heading text-2xl font-semibold text-gray-700 mb-6">4.3 Utilizando Cartões de Pontuação (Scorecards)</h3>
+
+            <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100 mb-6">
+              <p class="mb-4">
+                Os cartões de pontuação são componentes visuais simples, mas extremamente eficazes, usados para destacar uma única métrica-chave (KPI) em um dashboard. Eles exibem o valor atual da métrica de forma clara e proeminente.
+              </p>
+
+              <div class="grid md:grid-cols-3 gap-6 mt-6">
+                <div class="text-center p-4 bg-gradient-to-b from-green-50 to-green-100 rounded-lg">
+                  <i class="fas fa-dollar-sign text-3xl text-green-600 mb-3"></i>
+                  <h4 class="font-bold text-2xl text-green-800">R$ 125.430</h4>
+                  <p class="text-sm text-green-600">Receita Total</p>
+                </div>
+                <div class="text-center p-4 bg-gradient-to-b from-blue-50 to-blue-100 rounded-lg">
+                  <i class="fas fa-users text-3xl text-blue-600 mb-3"></i>
+                  <h4 class="font-bold text-2xl text-blue-800">2.847</h4>
+                  <p class="text-sm text-blue-600">Clientes Ativos</p>
+                </div>
+                <div class="text-center p-4 bg-gradient-to-b from-purple-50 to-purple-100 rounded-lg">
+                  <i class="fas fa-chart-line text-3xl text-purple-600 mb-3"></i>
+                  <h4 class="font-bold text-2xl text-purple-800">12.5%</h4>
+                  <p class="text-sm text-purple-600">Taxa de Conversão</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-6">
+              <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+                <h4 class="font-semibold text-lg mb-4">
+                  <i class="fas fa-plus-circle mr-2 text-green-600"></i>
+                  Inserindo um Cartão de Pontuação
+                </h4>
+                <ol class="space-y-2 text-sm">
+                  <li>1. Clique no ícone &#34;Adicionar um cartão de pontuação&#34; na barra de ferramentas</li>
+                  <li>2. Selecione o cartão no canvas</li>
+                  <li>3. No painel de propriedades, arraste uma métrica (campo azul) para a área de &#34;Métrica&#34;</li>
+                  <li>4. Personalize o estilo na guia &#34;Estilo&#34;</li>
+                </ol>
+              </div>
+
+              <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+                <h4 class="font-semibold text-lg mb-4">
+                  <i class="fas fa-trending-up mr-2 text-orange-600"></i>
+                  Configurando Comparações com Períodos Anteriores
+                </h4>
+                <p class="mb-4">
+                  Uma das funcionalidades mais poderosas dos scorecards é mostrar a comparação com um período anterior, adicionando contexto valioso.
+                </p>
+                <div class="bg-orange-50 p-4 rounded">
+                  <p class="text-orange-700 text-sm">
+                    <strong>Passos:</strong> Selecione o cartão de pontuação e marque a caixa &#34;Mostrar comparação&#34; no painel de propriedades. Defina o período de comparação e as cores da seta (verde para aumento, vermelho para diminuição).
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <!-- Interactivity Section -->
+        <section id="interatividade" class="mb-16">
+          <h2 class="serif-heading text-4xl font-bold text-gray-800 mb-8">5. Adicionando Interatividade com Controles de Filtro</h2>
+
+          <div id="filtros-data" class="mb-12">
+            <h3 class="serif-heading text-2xl font-semibold text-gray-700 mb-6">5.1 Filtros de Intervalo de Data</h3>
+
+            <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100 mb-6">
+              <p class="mb-4">
+                Os filtros de intervalo de data são controles interativos que permitem aos usuários ajustar o período de tempo dos dados exibidos em todos os componentes do dashboard.
+              </p>
+
+              <div class="bg-blue-50 p-4 rounded-lg">
+                <h4 class="font-semibold text-blue-800 mb-2">
+                  <i class="fas fa-calendar-alt mr-2"></i>
+                  Adicionando um Controle de Intervalo de Data
+                </h4>
+                <ol class="text-blue-700 text-sm space-y-1">
+                  <li>1. Clique no ícone &#34;Adicionar um controle&#34; na barra de ferramentas</li>
+                  <li>2. Selecione &#34;Controle de intervalo de data&#34;</li>
+                  <li>3. Posicione o controle no canvas</li>
+                  <li>4. No painel de propriedades, selecione a dimensão de data a ser usada</li>
+                </ol>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+              <h4 class="font-semibold text-lg mb-4">Configurando o Período Padrão</h4>
+              <p class="mb-4">
+                Configure um período padrão para garantir que o relatório sempre abra com uma visão de tempo relevante.
+              </p>
+              <div class="grid md:grid-cols-3 gap-4">
+                <div class="bg-green-50 p-3 rounded text-center">
+                  <i class="fas fa-calendar-day text-green-600 mb-2"></i>
+                  <p class="text-sm font-medium">Hoje</p>
+                </div>
+                <div class="bg-blue-50 p-3 rounded text-center">
+                  <i class="fas fa-calendar-week text-blue-600 mb-2"></i>
+                  <p class="text-sm font-medium">Esta Semana</p>
+                </div>
+                <div class="bg-purple-50 p-3 rounded text-center">
+                  <i class="fas fa-calendar-alt text-purple-600 mb-2"></i>
+                  <p class="text-sm font-medium">Este Mês</p>
+                </div>
+              </div>
+              <p class="mt-4 text-gray-600 text-sm">
+                Outras opções disponíveis: Últimos 7 dias, Últimos 30 dias, Este Ano, etc.
+              </p>
+            </div>
+          </div>
+
+          <div id="filtros-dimensao" class="mb-12">
+            <h3 class="serif-heading text-2xl font-semibold text-gray-700 mb-6">5.2 Filtros de Dimensão</h3>
+
+            <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100 mb-6">
+              <p class="mb-4">
+                Os filtros de dimensão permitem filtrar os dados com base em atributos categóricos como &#34;Produto&#34;, &#34;Região&#34; ou &#34;Canal de Marketing&#34;. O Looker Studio oferece dois tipos principais:
+              </p>
+
+              <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-gray-50 p-4 rounded">
+                  <h4 class="font-medium mb-2">
+                    <i class="fas fa-chevron-down mr-2 text-gray-600"></i>
+                    Lista Suspensa
+                  </h4>
+                  <p class="text-sm text-gray-600">
+                    Menu suspenso que economiza espaço no canvas. Ideal para dimensões com muitos valores únicos.
+                  </p>
+                </div>
+                <div class="bg-gray-50 p-4 rounded">
+                  <h4 class="font-medium mb-2">
+                    <i class="fas fa-list mr-2 text-gray-600"></i>
+                    Lista de Tamanho Fixo
+                  </h4>
+                  <p class="text-sm text-gray-600">
+                    Exibe todas as opções de uma vez. Útil quando há um número limitado de valores.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-6">
+              <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+                <h4 class="font-semibold text-lg mb-4">
+                  <i class="fas fa-filter mr-2 text-purple-600"></i>
+                  Adicionando um Controle de Filtro de Dimensão
+                </h4>
+                <ol class="space-y-2 text-sm">
+                  <li>1. Clique em &#34;Adicionar um controle&#34; na barra de ferramentas</li>
+                  <li>2. Escolha entre &#34;Lista suspensa&#34; ou &#34;Lista de tamanho fixo&#34;</li>
+                  <li>3. Posicione o controle no canvas</li>
+                  <li>4. No painel de propriedades, selecione a dimensão a ser filtrada</li>
+                </ol>
+              </div>
+
+              <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+                <h4 class="font-semibold text-lg mb-4">
+                  <i class="fas fa-check-square mr-2 text-green-600"></i>
+                  Permitindo Seleção de Múltiplos Valores
+                </h4>
+                <p class="mb-4">
+                  Por padrão, os controles permitem selecionar apenas um valor. Você pode permitir a seleção de múltiplos valores para análises mais complexas.
+                </p>
+                <div class="bg-green-50 p-4 rounded">
+                  <p class="text-green-700 text-sm">
+                    <strong>Passo:</strong> Selecione o controle de filtro e marque a caixa &#34;Selecionar múltiplo&#34; no painel de propriedades.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="cross-filtering" class="mb-12">
+            <h3 class="serif-heading text-2xl font-semibold text-gray-700 mb-6">5.3 Filtros de Cruzamento (Cross-filtering)</h3>
+
+            <div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-8 mb-8">
+              <h4 class="serif-heading text-2xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-mouse-pointer mr-3 text-purple-600"></i>
+                Análise Apontar-e-Clicar
+              </h4>
+              <p class="text-lg text-gray-700">
+                O filtro de cruzamento permite filtrar um relatório inteiro simplesmente clicando em um elemento de uma visualização. Crie uma experiência de análise de dados fluida e intuitiva.
+              </p>
+            </div>
+
+            <div class="space-y-6">
+              <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+                <h4 class="font-semibold text-lg mb-4">
+                  <i class="fas fa-toggle-on mr-2 text-orange-600"></i>
+                  Ativando a Interação de Filtro Cruzado
+                </h4>
+                <ol class="space-y-2 text-sm">
+                  <li>1. Selecione o gráfico que deseja tornar interativo</li>
+                  <li>2. No painel de propriedades, vá para a guia &#34;Configuração&#34;</li>
+                  <li>3. Na seção &#34;Interações&#34;, marque a caixa &#34;Filtro cruzado&#34;</li>
+                </ol>
+                <p class="mt-4 text-gray-600 text-sm">
+                  Uma vez ativado, o gráfico se torna um controle de filtro. Cliques em elementos aplicarão filtros a toda a página.
+                </p>
+              </div>
+
+              <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+                <h4 class="font-semibold text-lg mb-4">
+                  <i class="fas fa-magic mr-2 text-blue-600"></i>
+                  Como Funciona o Filtro Cruzado
+                </h4>
+                <div class="space-y-4">
+                  <div class="flex items-start space-x-3">
+                    <div class="bg-purple-100 p-2 rounded">
+                      <i class="fas fa-mouse-pointer text-purple-600"></i>
+                    </div>
+                    <div>
+                      <p class="font-medium">Clique em um Elemento</p>
+                      <p class="text-sm text-gray-600">Ex: Clique em uma barra específica em um gráfico de barras</p>
+                    </div>
+                  </div>
+
+                  <div class="flex items-start space-x-3">
+                    <div class="bg-blue-100 p-2 rounded">
+                      <i class="fas fa-filter text-blue-600"></i>
+                    </div>
+                    <div>
+                      <p class="font-medium">Filtro Aplicado</p>
+                      <p class="text-sm text-gray-600">Um filtro é definido baseado na dimensão e valor do elemento clicado</p>
+                    </div>
+                  </div>
+
+                  <div class="flex items-start space-x-3">
+                    <div class="bg-green-100 p-2 rounded">
+                      <i class="fas fa-sync text-green-600"></i>
+                    </div>
+                    <div>
+                      <p class="font-medium">Atualização Global</p>
+                      <p class="text-sm text-gray-600">Todos os componentes do relatório são filtrados para mostrar apenas dados relacionados</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mt-4 bg-blue-50 p-4 rounded">
+                  <p class="text-blue-700 text-sm">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    Para remover o filtro, clique no mesmo elemento novamente ou use o botão &#34;Limpar seleção&#34; que aparece no canto superior do relatório.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div class="section-divider"></div>
+
+        <!-- Finishing Section -->
+        <section id="finalizando" class="mb-16">
+          <h2 class="serif-heading text-4xl font-bold text-gray-800 mb-8">6. Finalizando e Compartilhando seu Relatório</h2>
+
+          <div id="temas-layouts" class="mb-12">
+            <h3 class="serif-heading text-2xl font-semibold text-gray-700 mb-6">6.1 Aplicando Temas e Layouts</h3>
+
+            <div class="grid md:grid-cols-2 gap-8 mb-8">
+              <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+                <h4 class="font-semibold text-lg mb-4">
+                  <i class="fas fa-palette mr-2 text-purple-600"></i>
+                  Escolhendo um Tema Predefinido
+                </h4>
+                <p class="mb-4">
+                  Clique em &#34;Tema e layout&#34; no menu do relatório para acessar uma variedade de temas pré-configurados.
+                </p>
+                <div class="space-y-2 text-sm text-gray-600">
+                  <p>• Cores harmoniosas e profissionais</p>
+                  <p>• Fontes e estilos consistentes</p>
+                  <p>• Aplicação com um único clique</p>
+                </div>
+              </div>
+
+              <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+                <h4 class="font-semibold text-lg mb-4">
+                  <i class="fas fa-cog mr-2 text-blue-600"></i>
+                  Escolhendo o Tipo de Layout
+                </h4>
+                <div class="space-y-4">
+                  <div class="bg-gray-50 p-3 rounded">
+                    <h5 class="font-medium">Layout Livre</h5>
+                    <p class="text-sm text-gray-600">Controle preciso sobre o posicionamento de cada elemento. Ideal para relatórios em desktop.</p>
+                  </div>
+                  <div class="bg-gray-50 p-3 rounded">
+                    <h5 class="font-medium">Layout Responsivo</h5>
+                    <p class="text-sm text-gray-600">Ajusta automaticamente para diferentes tamanhos de tela. Melhor para dispositivos móveis.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+              <h4 class="font-semibold text-lg mb-4">
+                <i class="fas fa-paint-brush mr-2 text-green-600"></i>
+                Personalizando Cores e Fontes para Alinhar com sua Marca
+              </h4>
+              <p class="mb-4">
+                No painel de temas, clique em &#34;Personalizar&#34; para criar um tema que reflita a identidade visual da sua marca.
+              </p>
+              <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                  <h5 class="font-medium mb-2">Personalização de Cores:</h5>
+                  <ul class="space-y-1 text-sm text-gray-600">
+                    <li>• Defina cores primária e secundária</li>
+                    <li>• Escolha cores de destaque</li>
+                    <li>• Use códigos hexadecimais para precisão</li>
+                  </ul>
+                </div>
+                <div>
+                  <h5 class="font-medium mb-2">Personalização de Fontes:</h5>
+                  <ul class="space-y-1 text-sm text-gray-600">
+                    <li>• Escolha fontes do Google Fonts</li>
+                    <li>• Defina tamanhos para títulos e texto</li>
+                    <li>• Mantenha consistência visual</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="titulos-anotacoes" class="mb-12">
+            <h3 class="serif-heading text-2xl font-semibold text-gray-700 mb-6">6.2 Adicionando Títulos e Anotações</h3>
+
+            <div class="space-y-6">
+              <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+                <h4 class="font-semibold text-lg mb-4">
+                  <i class="fas fa-font mr-2 text-blue-600"></i>
+                  Inserindo Caixas de Texto para Contexto
+                </h4>
+                <p class="mb-4">
+                  Use a ferramenta de texto para adicionar contexto ao relatório:
+                </p>
+                <ul class="space-y-2 text-sm">
+                  <li>• <strong>Títulos principais:</strong> Descrevam o propósito do dashboard</li>
+                  <li>• <strong>Subtítulos:</strong> Explique seções específicas</li>
+                  <li>• <strong>Rodapés:</strong> Informações importantes como data de atualização</li>
+                  <li>• <strong>Notas explicativas:</strong> Destaque insights e anomalias</li>
+                </ul>
+                <p class="mt-4 text-gray-600 text-sm">
+                  A formatação do texto (fonte, tamanho, cor, alinhamento) pode ser ajustada na guia &#34;Estilo&#34; do painel de propriedades.
+                </p>
+              </div>
+
+              <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+                <h4 class="font-semibold text-lg mb-4">
+                  <i class="fas fa-shapes mr-2 text-purple-600"></i>
+                  Adicionando Formas e Imagens para Melhorar o Design
+                </h4>
+                <div class="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <h5 class="font-medium mb-2">Formas:</h5>
+                    <ul class="space-y-1 text-sm text-gray-600">
+                      <li>• Retângulos e círculos para agrupar visualmente componentes</li>
+                      <li>• Linhas divisorias para separar seções</li>
+                      <li>• Setas para indicar fluxos ou relações</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h5 class="font-medium mb-2">Imagens:</h5>
+                    <ul class="space-y-1 text-sm text-gray-600">
+                      <li>• Logotipo da empresa no cabeçalho</li>
+                      <li>• Ícones para representar seções visualmente</li>
+                      <li>• Imagens de fundo para design atraente</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="compartilhando" class="mb-12">
+            <h3 class="serif-heading text-2xl font-semibold text-gray-700 mb-6">6.3 Salvando e Compartilhando seu Relatório</h3>
+
+            <div class="bg-green-50 border-l-4 border-green-500 p-6 mb-8">
+              <h4 class="font-semibold text-green-800 mb-2">
+                <i class="fas fa-save mr-2"></i>
+                Salvamento Automático do Looker Studio
+              </h4>
+              <p class="text-green-700 mb-2">
+                O Looker Studio possui um sistema de salvamento automático. Todas as alterações são salvas em tempo real, sem a necessidade de um botão &#34;Salvar&#34; tradicional.
+              </p>
+              <p class="text-green-700 text-sm">
+                Para reverter alterações, use Ctrl+Z (ou Cmd+Z no Mac) ou acesse o histórico de versões no menu &#34;Arquivo&#34; &gt; &#34;Histórico de versões&#34;.
+              </p>
+            </div>
+
+            <div class="space-y-6 mb-8">
+              <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+                <h4 class="font-semibold text-lg mb-4">
+                  <i class="fas fa-share-alt mr-2 text-blue-600"></i>
+                  Compartilhando o Relatório com Outros Usuários
+                </h4>
+                <ol class="space-y-2 text-sm">
+                  <li>1. Clique no botão &#34;Compartilhar&#34; no canto superior direito</li>
+                  <li>2. Adicione os endereços de e-mail das pessoas</li>
+                  <li>3. Defina o nível de permissão</li>
+                  <li>4. Opcionalmente, adicione uma mensagem ao convite</li>
+                </ol>
+              </div>
+
+              <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+                <h4 class="font-semibold text-lg mb-4">
+                  <i class="fas fa-key mr-2 text-orange-600"></i>
+                  Níveis de Permissão
+                </h4>
+                <div class="space-y-4">
+                  <div class="flex items-start space-x-3">
+                    <i class="fas fa-eye text-blue-600 mt-1"></i>
+                    <div>
+                      <p class="font-medium">Visualizador</p>
+                      <p class="text-sm text-gray-600">Pode ver, interagir com filtros e exportar dados, mas não pode fazer alterações</p>
+                    </div>
+                  </div>
+                  <div class="flex items-start space-x-3">
+                    <i class="fas fa-edit text-green-600 mt-1"></i>
+                    <div>
+                      <p class="font-medium">Editor</p>
+                      <p class="text-sm text-gray-600">Pode modificar visualizações, adicionar componentes e alterar o layout</p>
+                    </div>
+                  </div>
+                  <div class="flex items-start space-x-3">
+                    <i class="fas fa-crown text-purple-600 mt-1"></i>
+                    <div>
+                      <p class="font-medium">Proprietário</p>
+                      <p class="text-sm text-gray-600">Controle total, incluindo a capacidade de excluir o relatório</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-purple-50 border-l-4 border-purple-500 p-6">
+              <h4 class="font-semibold text-purple-800 mb-2">
+                <i class="fas fa-exchange-alt mr-2"></i>
+                Alternando entre os Modos de Edição e Visualização
+              </h4>
+              <p class="text-purple-700 mb-2">
+                O Looker Studio possui dois modos principais: Modo de Edição e Modo de Visualização.
+              </p>
+              <p class="text-purple-700 text-sm">
+                Use o botão &#34;Visualizar&#34; para ver o relatório como os usuários finais o verão. Clique em &#34;Editar&#34; para voltar ao modo de construção. Teste sempre no Modo de Visualização para garantir uma experiência do usuário fluida.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Conclusion -->
+        <section class="bg-gradient-to-r from-blue-50 to-green-50 rounded-lg p-8">
+          <div class="text-center">
+            <h2 class="serif-heading text-3xl font-bold text-gray-800 mb-4">
+              Parabéns! Você está pronto para criar dashboards incríveis
+            </h2>
+            <p class="text-lg text-gray-700 mb-6">
+              Você aprendeu os fundamentos do Looker Studio e está pronto para transformar seus dados em insights visuais impactantes.
+            </p>
+            <div class="flex justify-center space-x-4">
+              <div class="text-center">
+                <i class="fas fa-chart-line text-3xl text-blue-600 mb-2"></i>
+                <p class="text-sm font-medium">Análise de Dados</p>
+              </div>
+              <div class="text-center">
+                <i class="fas fa-eye text-3xl text-green-600 mb-2"></i>
+                <p class="text-sm font-medium">Visualizações</p>
+              </div>
+              <div class="text-center">
+                <i class="fas fa-users text-3xl text-purple-600 mb-2"></i>
+                <p class="text-sm font-medium">Compartilhamento</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <script>
+        // Table of Contents Navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            const tocLinks = document.querySelectorAll('.toc-link');
+            const sections = document.querySelectorAll('section[id], div[id]');
+            
+            // Smooth scrolling for TOC links
+            tocLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href').substring(1);
+                    const targetElement = document.getElementById(targetId);
+                    
+                    if (targetElement) {
+                        const offsetTop = targetElement.offsetTop - 20;
+                        window.scrollTo({
+                            top: offsetTop,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+            
+            // Update active TOC link on scroll
+            function updateActiveTocLink() {
+                const scrollPosition = window.scrollY + 100;
+                
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionBottom = sectionTop + section.offsetHeight;
+                    const sectionId = section.getAttribute('id');
+                    
+                    if (scrollPosition >= sectionTop && scrollPosition < sectionBottom) {
+                        tocLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href') === `#${sectionId}`) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }
+            
+            window.addEventListener('scroll', updateActiveTocLink);
+            updateActiveTocLink(); // Initial call
+            
+            // Mobile TOC toggle
+            const tocToggle = document.createElement('button');
+            tocToggle.innerHTML = '<i class="fas fa-bars"></i>';
+            tocToggle.className = 'fixed top-4 left-4 z-50 bg-white p-3 rounded-lg shadow-lg md:hidden';
+            tocToggle.addEventListener('click', function() {
+                document.querySelector('.toc-fixed').classList.toggle('open');
+            });
+            document.body.appendChild(tocToggle);
+            
+            // Close TOC when clicking outside on mobile
+            document.addEventListener('click', function(event) {
+                const toc = document.querySelector('.toc-fixed');
+                const isTocOpen = toc.classList.contains('open');
+                const isClickInsideToc = toc.contains(event.target);
+                const isClickOnToggle = tocToggle.contains(event.target);
+                
+                if (isTocOpen && !isClickInsideToc && !isClickOnToggle) {
+                    toc.classList.remove('open');
+                }
+            });
+            
+            // Close TOC when a TOC link is clicked (on mobile)
+            tocLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    if (window.innerWidth <= 1024) {
+                        document.querySelector('.toc-fixed').classList.remove('open');
+                    }
+                });
+            });
+        });
+    </script>
+  
+
+</body></html>
