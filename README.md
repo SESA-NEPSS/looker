@@ -1,6 +1,6 @@
 
 
-# Curso Introdutório de Looker Studio para Usuários de Planilhas
+# Tutorial Introdutório de Looker Studio para Usuários de Planilhas
 
 ## 1. Introdução e Preparação
 
